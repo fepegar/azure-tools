@@ -24,7 +24,7 @@ app = typer.Typer()
 
 @app.command()
 def download(
-    run_id: str = typer.Option(
+    run_ids: List[str] = typer.Option(
         ...,
         '--run-id',
         '-r',
@@ -57,16 +57,17 @@ def download(
     ),
 ) -> None:
     workspace = get_workspace()
-    run = get_run(workspace, run_id)
-    files_to_download = get_files_to_download(run, aml_path)
-    download_files(
-        run,
-        files_to_download,
-        out_dir,
-        dry_run=dry_run,
-        force=force,
-        convert_logs=convert_logs,
-    )
+    for run_id in run_ids:
+        run = get_run(workspace, run_id)
+        files_to_download = get_files_to_download(run, aml_path)
+        download_files(
+            run,
+            files_to_download,
+            out_dir,
+            dry_run=dry_run,
+            force=force,
+            convert_logs=convert_logs,
+        )
 
 
 @app.command()
