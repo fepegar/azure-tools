@@ -120,11 +120,7 @@ def download_files(
             run.download_file(found_run_filepath, out_path)
             filesize = out_path.stat().st_size
             progress.log(f'Downloaded "{out_path}" ({naturalsize(filesize)})')
-            import time; time.sleep(0.1)
-            progress.log(f'Downloaded "{out_path}" ()')
             progress.update(task, advance=1)
-        # Remove description
-        progress.update(task, description='')
 
 
 class BarlessProgress(Progress):
