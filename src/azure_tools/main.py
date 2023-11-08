@@ -89,7 +89,7 @@ def get_run(workspace: Workspace,  run_id: str) -> Run:
     return run
 
 
-def get_files_to_download(run: Run, aml_path: Path | None) -> List[Path]:
+def get_files_to_download(run: Run, aml_path: Optional[Path]) -> List[Path]:
     with BarlessProgress() as progress:
         task = progress.add_task(f'Getting files in run "{run.id}"', total=1)
         run_filepaths = [Path(p) for p in run.get_file_names()]
@@ -106,7 +106,7 @@ def get_files_to_download(run: Run, aml_path: Path | None) -> List[Path]:
 def download_files(
     run: Run,
     files_to_download: List[Path],
-    out_dir: Path | None,
+    out_dir: Optional[Path],
     dry_run: bool = False,
     force: bool = False,
 ) -> None:
