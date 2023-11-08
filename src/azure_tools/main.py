@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -42,11 +43,16 @@ def download(
         '--dry-run',
         '-n',
     ),
+    force: bool = typer.Option(
+        False,
+        '--force',
+        '-f',
+    ),
 ) -> None:
     workspace = get_workspace()
     run = get_run(workspace, run_id)
     files_to_download = get_files_to_download(run, aml_path)
-    download_files(run, files_to_download, out_dir, dry_run=dry_run)
+    download_files(run, files_to_download, out_dir, dry_run=dry_run, force=force)
 
 
 @app.command()
@@ -97,6 +103,7 @@ def download_files(
     files_to_download: list[Path],
     out_dir: Path | None,
     dry_run: bool = False,
+    force: bool = False,
 ) -> None:
     if out_dir is None:
         out_dir = Path(run.id)
@@ -104,6 +111,8 @@ def download_files(
     single_file = num_files_to_download == 1
     progress_class = BarlessProgress if single_file else BarProgress
     message = '' if single_file else  f'Downloading {num_files_to_download} files'
+    downloaded_bytes = 0
+    start = time.time()
     with progress_class(transient=True) as progress:
         task = progress.add_task(message, total=num_files_to_download)
         for found_run_filepath in files_to_download:
@@ -116,10 +125,17 @@ def download_files(
                 progress.log(f'Would download "{found_run_filepath}" to "{out_path}"')
                 progress.update(task, advance=1)
                 continue
+            if out_path.exists() and not force:
+                progress.log(f'"{out_path}" already exists. Skipping')
+                progress.update(task, advance=1)
+                continue
             out_path.parent.mkdir(parents=True, exist_ok=True)
             run.download_file(found_run_filepath, out_path)
             filesize = out_path.stat().st_size
-            progress.log(f'Downloaded "{out_path}" ({naturalsize(filesize)})')
+            downloaded_bytes += filesize
+            elapsed = time.time() - start
+            bytes_per_second = int(round(downloaded_bytes / elapsed))
+            progress.log(f'Downloaded "{out_path}" ({naturalsize(filesize)}) [{naturalsize(bytes_per_second)}/s]')
             progress.update(task, advance=1)
 
 
