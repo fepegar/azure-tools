@@ -49,11 +49,24 @@ def download(
         '--force',
         '-f',
     ),
+    convert_logs: bool = typer.Option(
+        False,
+        '--convert-logs',
+        '-l',
+        help='Convert .txt files to .log files if "log" is in their path',
+    ),
 ) -> None:
     workspace = get_workspace()
     run = get_run(workspace, run_id)
     files_to_download = get_files_to_download(run, aml_path)
-    download_files(run, files_to_download, out_dir, dry_run=dry_run, force=force)
+    download_files(
+        run,
+        files_to_download,
+        out_dir,
+        dry_run=dry_run,
+        force=force,
+        convert_logs=convert_logs,
+    )
 
 
 @app.command()
@@ -109,6 +122,7 @@ def download_files(
     out_dir: Optional[Path],
     dry_run: bool = False,
     force: bool = False,
+    convert_logs: bool = False,
 ) -> None:
     if out_dir is None:
         out_dir = Path(run.id)
@@ -122,6 +136,8 @@ def download_files(
         task = progress.add_task(message, total=num_files_to_download)
         for found_run_filepath in files_to_download:
             out_path = out_dir / found_run_filepath
+            if 'log' in str(out_path) and out_path.suffix == '.txt' and convert_logs:
+                out_path = out_path.with_suffix('.log')
             progress.update(
                 task,
                 description=f'Downloading "{found_run_filepath}"',
