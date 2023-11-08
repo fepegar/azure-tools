@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azure_tools"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "azureml-core",
+    "azure-identity",
+    "humanize",
+    "loguru",
+    "python-dotenv",
+    "typer[all]",
+]
+
+[project.entry-points.console_scripts]
+aml = "azure_tools.main:app"
