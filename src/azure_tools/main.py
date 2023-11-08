@@ -7,6 +7,7 @@ from azureml.core import Run
 from azureml.core import Workspace
 from dotenv import load_dotenv
 from humanize import naturalsize
+from rich import print
 from rich.progress import BarColumn
 from rich.progress import MofNCompleteColumn
 from rich.progress import Progress
@@ -31,19 +32,21 @@ def download(
         '--source-aml-path',
         '-s',
     ),
-    out_path: Optional[Path] = typer.Option(
+    out_dir: Optional[Path] = typer.Option(
         None,
-        '--out-path',
+        '--out-dir',
         '-d',
     ),
+    dry_run: bool = typer.Option(
+        False,
+        '--dry-run',
+        '-n',
+    ),
 ) -> None:
-    if out_path is None:
-        out_path = Path()
-
     workspace = get_workspace()
     run = get_run(workspace, run_id)
     files_to_download = get_files_to_download(run, aml_path)
-    download_files(run, files_to_download, out_path)
+    download_files(run, files_to_download, out_dir, dry_run=dry_run)
 
 
 @app.command()
@@ -72,6 +75,7 @@ def get_run(workspace: Workspace,  run_id: str) -> Run:
         task = progress.add_task(f'Getting run "{run_id}"', total=1)
         run = workspace.get_run(run_id)
         progress.update(task, advance=1)
+    print(f'Found run with display name: "{run.display_name}" in experiment "{run.experiment.name}"')
     return run
 
 
@@ -88,7 +92,14 @@ def get_files_to_download(run: Run, aml_path: Path | None) -> list[Path]:
     return files_to_download
 
 
-def download_files(run: Run, files_to_download: list[Path], out_path: Path) -> None:
+def download_files(
+    run: Run,
+    files_to_download: list[Path],
+    out_dir: Path | None,
+    dry_run: bool = False,
+) -> None:
+    if out_dir is None:
+        out_dir = Path(run.id)
     num_files_to_download = len(files_to_download)
     single_file = num_files_to_download == 1
     progress_class = BarlessProgress if single_file else BarProgress
@@ -96,18 +107,21 @@ def download_files(run: Run, files_to_download: list[Path], out_path: Path) -> N
     with progress_class(transient=True) as progress:
         task = progress.add_task(message, total=num_files_to_download)
         for found_run_filepath in files_to_download:
-            if out_path.is_dir():
-                this_out_path = out_path / found_run_filepath
-            else:
-                this_out_path = out_path
+            out_path = out_dir / found_run_filepath
             progress.update(
                 task,
                 description=f'Downloading "{found_run_filepath}"',
             )
-            this_out_path.parent.mkdir(parents=True, exist_ok=True)
-            run.download_file(found_run_filepath, this_out_path)
-            filesize = this_out_path.stat().st_size
-            progress.log(f'Downloaded "{this_out_path}" ({naturalsize(filesize)})')
+            if dry_run:
+                progress.log(f'Would download "{found_run_filepath}" to "{out_path}"')
+                progress.update(task, advance=1)
+                continue
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            run.download_file(found_run_filepath, out_path)
+            filesize = out_path.stat().st_size
+            progress.log(f'Downloaded "{out_path}" ({naturalsize(filesize)})')
+            import time; time.sleep(0.1)
+            progress.log(f'Downloaded "{out_path}" ()')
             progress.update(task, advance=1)
         # Remove description
         progress.update(task, description='')
