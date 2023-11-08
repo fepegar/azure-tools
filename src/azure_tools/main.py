@@ -94,7 +94,8 @@ def get_files_to_download(run: Run, aml_path: Path | None) -> list[Path]:
         return run_filepaths
     files_to_download = [p for p in run_filepaths if str(p).startswith(str(aml_path))]
     if not files_to_download:
-        raise ValueError(f'No files found in run "{run.id}" matching "{aml_path}"')
+        print(f'No files found in run "{run.id}" matching "{aml_path}"')
+        raise typer.Exit(code=1)
     return files_to_download
 
 
