@@ -9,12 +9,12 @@ from azureml.core import Run
 from azureml.core import Workspace
 from dotenv import load_dotenv
 from humanize import naturalsize
+from loguru import logger
 from rich import print
 from rich.progress import BarColumn
 from rich.progress import MofNCompleteColumn
 from rich.progress import Progress
 from rich.progress import SpinnerColumn
-from rich.progress import TaskProgressColumn
 from rich.progress import TextColumn
 from rich.progress import TimeElapsedColumn
 
@@ -112,7 +112,7 @@ def get_files_to_download(run: Run, aml_path: Optional[Path]) -> List[Path]:
         return run_filepaths
     files_to_download = [p for p in run_filepaths if str(p).startswith(str(aml_path))]
     if not files_to_download:
-        print(f'No files found in run "{run.id}" matching "{aml_path}"')
+        logger.error(f'No files found in run "{run.id}" matching "{aml_path}"')
         raise typer.Exit(code=1)
     return files_to_download
 
