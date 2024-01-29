@@ -1,7 +1,8 @@
 # Some tools for Azure Machine Learning
 
 ```shell
-pip install git+https://github.com/fepegar/azure-tools.git
+git clone https://github.com/fepegar/azure-tools.git
+pip install ./azure-tools
 aml --help
 ```
 
