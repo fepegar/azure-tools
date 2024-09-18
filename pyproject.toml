@@ -12,6 +12,7 @@ dependencies = [
     "humanize",
     "loguru",
     "python-dotenv",
+    "tensorboard",
     "typer[all]",
 ]
 

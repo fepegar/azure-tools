@@ -1,8 +1,10 @@
+from tempfile import gettempdir
 from pathlib import Path
 from typing import List
 from typing import Optional
 
 import typer
+from tensorboard import program
 
 from .aml import download_files
 from .aml import download_snapshot
@@ -83,6 +85,36 @@ def snapshot(
             out_dir=out_dir,
         )
     return
+
+
+@app.command()
+def tensorboard(
+    run_id: str = typer.Option(
+        ...,
+        '--run-id',
+        '-r',
+    ),
+    force: bool = typer.Option(
+        False,
+        '--force',
+        '-f',
+    ),
+) -> None:
+    workspace = get_workspace()
+    run = get_run(workspace, run_id)
+    aml_dir = Path('logs/tensorboard')
+    files_to_download = get_files_to_download(run, aml_dir)
+    out_dir = Path(gettempdir()) / run_id
+    download_files(
+        run,
+        files_to_download,
+        out_dir,
+        force=force,
+    )
+    tb = program.TensorBoard()
+    tb.configure(argv=[None, '--logdir', str(out_dir)])
+    url = tb.launch()
+    print(f"Tensorflow listening on {url}")
 
 
 if __name__ == "__main__":
