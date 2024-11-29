@@ -9,25 +9,19 @@ from typing import Optional
 import typer
 from azureml.core import Run
 from azureml.core import Workspace
-from dotenv import load_dotenv
+from azureml.exceptions import ServiceException
 from humanize import naturalsize
 from loguru import logger
 from rich import print
 
-from .progress import BarProgress
 from .progress import BarlessProgress
+from .progress import BarProgress
 
 
-def get_workspace() -> Workspace:
-    load_dotenv()
-    name = os.environ["WORKSPACE_NAME"]
+def get_workspace(config_path: Path) -> Workspace:
     with BarlessProgress() as progress:
-        task = progress.add_task(f'Getting workspace "{name}"', total=1)
-        workspace = Workspace(
-            os.environ["SUBSCRIPTION_ID"],
-            os.environ["RESOURCE_GROUP"],
-            name,
-        )
+        task = progress.add_task("Getting workspace", total=1)
+        workspace = Workspace.from_config(str(config_path))
         progress.update(task, advance=1)
     return workspace
 
@@ -35,7 +29,12 @@ def get_workspace() -> Workspace:
 def get_run(workspace: Workspace,  run_id: str) -> Run:
     with BarlessProgress() as progress:
         task = progress.add_task(f'Getting run "{run_id}"', total=1)
-        run = workspace.get_run(run_id)
+        try:
+            run = workspace.get_run(run_id)
+        except ServiceException as e:
+            msg = f'Run "{run_id}" not found in workspace "{workspace.name}"'
+            logger.error(msg)
+            raise RuntimeError(msg) from e
         progress.update(task, advance=1)
     print(
         f'Found run with display name: "{run.display_name}"'
@@ -54,7 +53,7 @@ def get_files_to_download(run: Run, aml_path: Optional[Path]) -> List[Path]:
     files_to_download = [p for p in run_filepaths if str(p).startswith(str(aml_path))]
     if not files_to_download:
         logger.error(f'No files found in run "{run.id}" matching "{aml_path}"')
-        raise typer.Exit(code=1)
+        raise typer.Abort()
     return files_to_download
 
 

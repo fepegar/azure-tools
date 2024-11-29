@@ -10,12 +10,19 @@ from .aml import get_files_to_download
 from .aml import get_run
 from .aml import get_workspace
 
+app = typer.Typer(
+    no_args_is_help=True,
+    pretty_exceptions_show_locals=False,
+)
 
-app = typer.Typer()
 
-
-@app.command()
+@app.command(no_args_is_help=True)
 def download(
+    config_path: Path = typer.Option(
+        ...,
+        '--config',
+        '-c',
+    ),
     run_ids: List[str] = typer.Option(
         ...,
         '--run-id',
@@ -48,7 +55,7 @@ def download(
         help='Convert .txt files to .log files if "log" is in their path',
     ),
 ) -> None:
-    workspace = get_workspace()
+    workspace = get_workspace(config_path)
     for run_id in run_ids:
         run = get_run(workspace, run_id)
         files_to_download = get_files_to_download(run, aml_path)
@@ -62,8 +69,13 @@ def download(
         )
 
 
-@app.command()
+@app.command(no_args_is_help=True)
 def snapshot(
+    config_path: Path = typer.Option(
+        ...,
+        '--config',
+        '-c',
+    ),
     run_ids: List[str] = typer.Option(
         ...,
         '--run-id',
@@ -75,14 +87,10 @@ def snapshot(
         '-d',
     ),
 ) -> None:
-    workspace = get_workspace()
+    workspace = get_workspace(config_path)
     for run_id in run_ids:
         run = get_run(workspace, run_id)
-        download_snapshot(
-            run,
-            out_dir=out_dir,
-        )
-    return
+        download_snapshot(run, out_dir=out_dir)
 
 
 if __name__ == "__main__":

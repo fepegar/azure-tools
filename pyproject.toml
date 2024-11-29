@@ -8,12 +8,14 @@ version = "0.1.0"
 requires-python = ">=3.8"
 dependencies = [
     "azureml-core",
-    "azure-identity",
     "humanize",
     "loguru",
-    "python-dotenv",
-    "typer[all]",
+    "setuptools",  # required by azureml-core
+    "typer",
 ]
 
 [project.entry-points.console_scripts]
 aml = "azure_tools.main:app"
+
+[tool.ruff.lint.isort]
+force-single-line = true
