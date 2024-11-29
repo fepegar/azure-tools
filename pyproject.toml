@@ -14,7 +14,7 @@ dependencies = [
     "typer",
 ]
 
-[project.entry-points.console_scripts]
+[project.scripts]
 aml = "azure_tools.main:app"
 
 [tool.ruff.lint.isort]

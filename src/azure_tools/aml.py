@@ -1,4 +1,3 @@
-import os
 import tempfile
 import time
 import zipfile
@@ -114,7 +113,7 @@ def download_snapshot(run: Run, out_dir: Optional[Path]) -> None:
         task = progress.add_task(f'Downloading snapshot from"{run.id}"', total=1)
         zip_path = run.restore_snapshot(path=str(out_dir))
         progress.update(task, advance=1)
-    unzip(zip_path, out_dir)
+    unzip(Path(zip_path), out_dir)
 
 
 def unzip(zip_path: Path, out_dir: Path) -> None:
