@@ -1,21 +1,29 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "azure_tools"
 version = "0.1.0"
-requires-python = ">=3.8"
+description = "Convenience CLI tools to work with Microsoft Azure."
+requires-python = ">=3.9"
+authors = [
+    { name = "Fernando Pérez-García", email = "fepegar@gmail.com" }
+]
 dependencies = [
     "azureml-core",
     "humanize",
     "loguru",
-    "setuptools",  # required by azureml-core
     "typer",
 ]
+readme = "README.md"
 
 [project.scripts]
 aml = "azure_tools.main:app"
 
+[project.urls]
+Homepage = "https://github.com/fepegar/azure-tools"
+Source = "https://github.com/fepegar/azure-tools"
+
 [tool.ruff.lint.isort]
 force-single-line = true
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
