@@ -1,6 +1,6 @@
 [project]
 name = "azure_tools"
-version = "0.1.0"
+version = "0.1.1"
 description = "Convenience CLI tools to work with Microsoft Azure."
 requires-python = ">=3.9"
 authors = [
@@ -10,6 +10,7 @@ dependencies = [
     "azureml-core",
     "humanize",
     "loguru",
+    "setuptools",  # required by azureml-core?
     "typer",
 ]
 readme = "README.md"
