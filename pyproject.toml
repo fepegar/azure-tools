@@ -2,7 +2,7 @@
 name = "azure_tools"
 version = "0.1.1"
 description = "Convenience CLI tools to work with Microsoft Azure."
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.13"
 authors = [
     { name = "Fernando Pérez-García", email = "fepegar@gmail.com" }
 ]
