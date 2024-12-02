@@ -12,8 +12,10 @@ uvx aml snapshot
 
 ```shell
 run_id="khaki_jelly_s70lr4lk7b"
-logs_dir="user_logs"
 config_path="workspace_properties.json"
+
+# Default directory where logs are saved
+logs_dir="user_logs"
 
 uv tool install --python "<3.13" --prerelease=allow --with pip azure-cli
 uvx az extension remove --name ml
@@ -23,7 +25,10 @@ config_query='{resource_group: .resource_group, workspace_name: .name, subscript
 uvx az ml workspace show | uvx jq --raw-output $config_query > $config_path
 cat $config_path
 
-# Why is uv not respecting the Python constraint?
+# We need to specify the Python version because uv's resolver ignores upper
+# bounds for Python version in pyproject.toml
+# https://docs.astral.sh/uv/reference/resolver-internals/#requires-python
+# and azureml.core._metrics breaks for Python >= 3.13
 uvx --python "<3.13" --from azure-tools \
     aml download \
         --config $config_path \
