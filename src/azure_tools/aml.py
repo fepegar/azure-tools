@@ -99,7 +99,7 @@ def download_files(
             downloaded_bytes += filesize
             elapsed = time.time() - start
             bytes_per_second = int(round(downloaded_bytes / elapsed))
-            size_human = naturalsize(filesize)
+            size_human = naturalsize(filesize, binary=True)
             speed_human = naturalsize(bytes_per_second)
             progress.log(f'Downloaded "{out_path}" ({size_human}) [{speed_human}/s]')
             progress.update(task, advance=1)
