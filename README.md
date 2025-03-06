@@ -7,25 +7,23 @@
 #### Create config file if needed
 
 ```shell
-
-config_path="config.json"  # workspace properties
-
-# Default directory where logs are saved
-logs_dir="user_logs"
-
 uv tool install --python "<3.13" --prerelease=allow --with pip azure-cli
-uvx az extension remove --name ml
-uvx az extension add --name ml
+
+uvx az extension remove --name ml  # if needed
+uvx az extension add --name ml  # if needed
 
 config_query='{resource_group: .resource_group, workspace_name: .name, subscription_id: (.id | split("/")[2])}'
-uvx az ml workspace show | uvx jq --raw-output $config_query > $config_path
-cat $config_path
+uvx az ml workspace show | uvx jq --raw-output $config_query > config.json
+cat config.json
 ```
 
 #### Download and display logs
 
 ```shell
-run_id="khaki_jelly_s70lr4lk7b"
+run_id="khaki_jelly_s70lr4lk7b"  # replace with your run ID
+logs_dir="user_logs"  # default directory where logs are saved
+
+config_path="config.json"  # workspace properties
 
 # We need to specify the Python version because uv's resolver ignores upper
 # bounds for Python version in pyproject.toml
