@@ -4,9 +4,11 @@
 
 ### Download and show user logs from a run
 
+#### Create config file if needed
+
 ```shell
-run_id="khaki_jelly_s70lr4lk7b"
-config_path="workspace_properties.json"
+
+config_path="config.json"  # workspace properties
 
 # Default directory where logs are saved
 logs_dir="user_logs"
@@ -18,6 +20,12 @@ uvx az extension add --name ml
 config_query='{resource_group: .resource_group, workspace_name: .name, subscription_id: (.id | split("/")[2])}'
 uvx az ml workspace show | uvx jq --raw-output $config_query > $config_path
 cat $config_path
+```
+
+#### Download and display logs
+
+```shell
+run_id="khaki_jelly_s70lr4lk7b"
 
 # We need to specify the Python version because uv's resolver ignores upper
 # bounds for Python version in pyproject.toml
