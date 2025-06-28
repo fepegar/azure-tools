@@ -7,10 +7,9 @@ authors = [
     { name = "Fernando Pérez-García", email = "fepegar@gmail.com" }
 ]
 dependencies = [
-    "azureml-core",
+    "azure-ai-ml",
     "humanize",
     "loguru",
-    "setuptools",  # required by azureml-core?
     "typer",
 ]
 readme = "README.md"
