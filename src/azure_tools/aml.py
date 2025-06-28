@@ -8,7 +8,7 @@ from typing import Optional
 import typer
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Job
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core.exceptions import ResourceNotFoundError, ClientAuthenticationError
 from azure.identity import DefaultAzureCredential
 from humanize import naturalsize
 from loguru import logger
@@ -161,8 +161,11 @@ def get_run(workspace: WorkspaceWrapper, run_id: str) -> RunWrapper:
         task = progress.add_task(f'Getting run "{run_id}"', total=1)
         try:
             run = workspace.get_run(run_id)
-        except ResourceNotFoundError as e:
-            msg = f'Run "{run_id}" not found in workspace "{workspace.name}"'
+        except (ResourceNotFoundError, ClientAuthenticationError) as e:
+            if isinstance(e, ResourceNotFoundError):
+                msg = f'Run "{run_id}" not found in workspace "{workspace.name}"'
+            else:
+                msg = f'Authentication failed when accessing run "{run_id}": {e}'
             logger.error(msg)
             raise RuntimeError(msg) from e
         progress.update(task, advance=1)
