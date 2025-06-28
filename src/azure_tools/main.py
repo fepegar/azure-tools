@@ -20,38 +20,38 @@ app = typer.Typer(
 def download(
     config_path: Path = typer.Option(
         ...,
-        '--config',
-        '-c',
+        "--config",
+        "-c",
     ),
     run_ids: List[str] = typer.Option(
         ...,
-        '--run-id',
-        '-r',
+        "--run-id",
+        "-r",
     ),
     aml_path: Optional[Path] = typer.Option(
         None,
-        '--source-aml-path',
-        '-s',
+        "--source-aml-path",
+        "-s",
     ),
     out_dir: Optional[Path] = typer.Option(
         None,
-        '--out-dir',
-        '-d',
+        "--out-dir",
+        "-d",
     ),
     dry_run: bool = typer.Option(
         False,
-        '--dry-run',
-        '-n',
+        "--dry-run",
+        "-n",
     ),
     force: bool = typer.Option(
         False,
-        '--force',
-        '-f',
+        "--force",
+        "-f",
     ),
     convert_logs: bool = typer.Option(
         False,
-        '--convert-logs',
-        '-l',
+        "--convert-logs",
+        "-l",
         help='Convert .txt files to .log files if "log" is in their path',
     ),
 ) -> None:
@@ -73,18 +73,18 @@ def download(
 def snapshot(
     config_path: Path = typer.Option(
         ...,
-        '--config',
-        '-c',
+        "--config",
+        "-c",
     ),
     run_ids: List[str] = typer.Option(
         ...,
-        '--run-id',
-        '-r',
+        "--run-id",
+        "-r",
     ),
     out_dir: Optional[Path] = typer.Option(
         None,
-        '--out-dir',
-        '-d',
+        "--out-dir",
+        "-d",
     ),
 ) -> None:
     workspace = get_workspace(config_path)
